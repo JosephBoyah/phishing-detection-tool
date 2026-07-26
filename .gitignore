@@ -1,0 +1,32 @@
+# ---- Python ----
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# ---- Secrets / credentials ----
+.env
+*.env
+.env.*
+SAFE_BROWSING_API_KEY*
+credentials.json
+*.key
+id_ed25519*
+
+# ---- Model artifacts (regenerate with train.py) ----
+models/*.joblib
+models/features.json
+
+# ---- Runtime data store (logs/reports) ----
+app/data/store.jsonl
+data/store.jsonl
+
+# ---- Caches / OS ----
+.DS_Store
+*.log
+.cache/
+
+# ---- Editor ----
+.vscode/
+.idea/

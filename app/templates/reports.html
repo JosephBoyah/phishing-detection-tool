@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reports · Phishing Detection Tool</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{--bg:#0f1226;--card:#1a1f3d;--accent:#7c5cff;--good:#3ddc84;--bad:#ff5470;--warn:#ffce5a;--ink:#eef0ff;--mut:#9aa0c7}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:linear-gradient(90deg,#1a1f3d,#241a4d);border-bottom:1px solid #2c2f55}
+  header h1{font-size:18px;margin:0}
+  nav a{color:var(--ink);text-decoration:none;margin-left:18px;font-size:14px;opacity:.85}
+  .wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+  .panel{background:var(--card);border-radius:14px;padding:18px;border:1px solid #2c2f55;margin-bottom:18px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid #262a4d}
+  th{color:var(--mut);font-weight:600}
+  .badge{padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700}
+  .b-phish{background:rgba(255,84,112,.18);color:var(--bad)}
+  .b-susp{background:rgba(255,206,90,.18);color:var(--warn)}
+  .b-legit{background:rgba(61,220,132,.18);color:var(--good)}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header><h1>🛡️ Phishing Detection Tool</h1>
+<nav><a href="/">Dashboard</a><a href="/scan">Scan</a><a href="/reports">Reports</a></nav></header>
+<div class="wrap">
+  <div class="panel">
+    <h2>Full scan log (reports)</h2>
+    <table>
+      <thead><tr><th>Time</th><th>Kind</th><th>Input</th><th>Verdict</th><th>Risk</th><th>ML</th></tr></thead>
+      <tbody>
+      {% for h in history %}
+        <tr>
+          <td>{{ h.ts | ctime }}</td>
+          <td>{{ h.kind }}</td>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ h.input[:60] }}</td>
+          <td>
+            {% if h.decision.verdict=='PHISHING' %}<span class="badge b-phish">PHISHING</span>
+            {% elif h.decision.verdict=='SUSPICIOUS' %}<span class="badge b-susp">SUSPICIOUS</span>
+            {% else %}<span class="badge b-legit">LEGIT</span>{% endif %}
+          </td>
+          <td>{{ h.decision.risk_score }}</td>
+          <td>{{ h.decision.ml_model }}{% if h.decision.ml_probability is not none %} ({{ h.decision.ml_probability }}){% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

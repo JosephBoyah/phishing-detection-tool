@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phishing Detection Tool</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{--bg:#0f1226;--card:#1a1f3d;--accent:#7c5cff;--good:#3ddc84;--bad:#ff5470;--warn:#ffce5a;--ink:#eef0ff;--mut:#9aa0c7}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:linear-gradient(90deg,#1a1f3d,#241a4d);border-bottom:1px solid #2c2f55}
+  header h1{font-size:18px;margin:0}
+  nav a{color:var(--ink);text-decoration:none;margin-left:18px;font-size:14px;opacity:.85}
+  nav a:hover{opacity:1;color:var(--accent)}
+  .wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+  .cards{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+  .stat{flex:1 1 160px;background:var(--card);border-radius:14px;padding:18px;border:1px solid #2c2f55}
+  .stat .n{font-size:30px;font-weight:800}
+  .stat .l{color:var(--mut);font-size:13px}
+  .grid{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+  .panel{background:var(--card);border-radius:14px;padding:18px;border:1px solid #2c2f55}
+  h2{font-size:16px;margin:0 0 12px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid #262a4d}
+  th{color:var(--mut);font-weight:600}
+  .badge{padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700}
+  .b-phish{background:rgba(255,84,112,.18);color:var(--bad)}
+  .b-susp{background:rgba(255,206,90,.18);color:var(--warn)}
+  .b-legit{background:rgba(61,220,132,.18);color:var(--good)}
+  .btn{background:var(--accent);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
+  .btn:hover{opacity:.9}
+  .pill{font-size:12px;color:var(--mut)}
+  .mt{margin-top:14px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🛡️ Phishing Detection Tool</h1>
+  <nav>
+    <a href="/">Dashboard</a>
+    <a href="/scan">Scan</a>
+    <a href="/reports">Reports</a>
+  </nav>
+</header>
+<div class="wrap">
+  <div class="cards">
+    <div class="stat"><div class="n">{{ stats.total }}</div><div class="l">Total scans</div></div>
+    <div class="stat"><div class="n" style="color:var(--bad)">{{ stats.phishing }}</div><div class="l">Phishing</div></div>
+    <div class="stat"><div class="n" style="color:var(--warn)">{{ stats.suspicious }}</div><div class="l">Suspicious</div></div>
+    <div class="stat"><div class="n" style="color:var(--good)">{{ stats.legit }}</div><div class="l">Legit</div></div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <h2>Verdict distribution</h2>
+      <canvas id="pie" height="180"></canvas>
+      <p class="pill mt">ML model: {{ 'active' if ml_available else 'rule-based only (train to enable)' }}</p>
+    </div>
+    <div class="panel">
+      <h2>Recent scans</h2>
+      <table>
+        <thead><tr><th>Time</th><th>Kind</th><th>Input</th><th>Verdict</th><th>Risk</th></tr></thead>
+        <tbody>
+        {% for h in history %}
+          <tr>
+            <td>{{ h.ts | ctime }}</td>
+            <td>{{ h.kind }}</td>
+            <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ h.input[:40] }}</td>
+            <td>
+              {% if h.decision.verdict=='PHISHING' %}<span class="badge b-phish">PHISHING</span>
+              {% elif h.decision.verdict=='SUSPICIOUS' %}<span class="badge b-susp">SUSPICIOUS</span>
+              {% else %}<span class="badge b-legit">LEGIT</span>{% endif %}
+            </td>
+            <td>{{ h.decision.risk_score }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <a class="btn mt" href="/scan">New scan →</a>
+    </div>
+  </div>
+</div>
+<script>
+const stats = {{ stats|tojson }};
+new Chart(document.getElementById('pie'),{
+  type:'doughnut',
+  data:{labels:['Phishing','Suspicious','Legit'],
+    datasets:[{data:[stats.phishing,stats.suspicious,stats.legit],
+      backgroundColor:['#ff5470','#ffce5a','#3ddc84']}]},
+  options:{plugins:{legend:{labels:{color:'#eef0ff'}}}}
+});
+</script>
+</body>
+</html>
