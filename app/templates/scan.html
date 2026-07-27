@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Scan · Phishing Detection Tool</title>
-<script src="{{ request.script_root }}/static/chart.umd.min.js"></script>
+<script src="{{ app_root }}/static/chart.umd.min.js"></script>
 <style>
   :root{--bg:#0f1226;--card:#1a1f3d;--accent:#7c5cff;--good:#3ddc84;--bad:#ff5470;--warn:#ffce5a;--ink:#eef0ff;--mut:#9aa0c7}
   *{box-sizing:border-box}
@@ -32,7 +32,7 @@
 </head>
 <body>
 <header><h1>🛡️ Phishing Detection Tool</h1>
-<nav><a href="{{ request.script_root }}/">Dashboard</a><a href="{{ request.script_root }}/scan">Scan</a><a href="{{ request.script_root }}/reports">Reports</a></nav></header>
+<nav><a href="{{ app_root }}/">Dashboard</a><a href="{{ app_root }}/scan">Scan</a><a href="{{ app_root }}/reports">Reports</a></nav></header>
 <div class="wrap">
   <div class="panel">
     <div class="seg">
@@ -50,7 +50,7 @@ function setKind(k){kind=k;document.getElementById('b-url').classList.toggle('on
 async function runScan(){
   const val=document.getElementById('input').value.trim();
   if(!val){alert('Paste something first');return;}
-  const res=await fetch(window.location.pathname.replace(/\/[^/]*$/,'')+'/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input:val,kind})});
+  const res=await fetch(window.location.pathname.split('/').slice(0,2).join('/')+'/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input:val,kind})});
   const d=await res.json();
   if(d.error){document.getElementById('result').innerHTML='<div class="verdict v-phish">Error: '+d.error+'</div>';return;}
   const v=d.decision.verdict;
