@@ -4,24 +4,18 @@ services:
     image: phishing-detection-tool:latest
     restart: unless-stopped
     environment:
-      - PORT=5000
+      - PORT=8080
       # Optional: enable Google Safe Browsing. Leave blank to disable (rule engine still works).
       - SAFE_BROWSING_API_KEY=${SAFE_BROWSING_API_KEY:-}
-    networks:
-      - foundation_net
+    network_mode: host
+    # Direct host port publish (no DNS / no cert needed). Also routed via Traefik
+    # for the public HTTPS domains below.
     labels:
       - "traefik.enable=true"
-      # Primary: paid domain (when DNS points here)
       - "traefik.http.routers.phishing.rule=Host(`phish.srv1846347.hstgr.cloud`)"
       - "traefik.http.routers.phishing.entrypoints=websecure"
       - "traefik.http.routers.phishing.tls.certresolver=letsencrypt"
-      # Fallback: free sslip.io magic domain (resolves straight to VPS IP, no purchase)
       - "traefik.http.routers.phishing-sslip.rule=Host(`phish.187.55.230.98.sslip.io`)"
       - "traefik.http.routers.phishing-sslip.entrypoints=websecure"
       - "traefik.http.routers.phishing-sslip.tls.certresolver=letsencrypt"
-      - "traefik.http.services.phishing.loadbalancer.server.port=5000"
-
-networks:
-  foundation_net:
-    external: true
-    name: foundation_net
+      - "traefik.http.services.phishing.loadbalancer.server.port=8080"
