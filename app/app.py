@@ -33,13 +33,10 @@ def _ctime(ts):
 app = Flask(__name__)
 app.jinja_env.filters["ctime"] = _ctime
 
-# Support being served under a path prefix (e.g. /phishing behind a reverse proxy).
+# Serve under a path prefix (e.g. /phishing behind a reverse proxy).
 APP_ROOT = os.environ.get("APP_ROOT", "/phishing")
 app.config["APPLICATION_ROOT"] = APP_ROOT
 
-from flask import Blueprint
-
-bp = Blueprint("phish", __name__, url_prefix=APP_ROOT)
 
 from features import extract_all
 from email_analysis import analyze_email
@@ -101,7 +98,7 @@ def _analyze(input_value: str, kind: str) -> dict:
     return rec
 
 
-@bp.route("/")
+@app.route("/")
 def dashboard():
     history = _load_history(50)
     stats = {"total": len(history), "phishing": 0, "suspicious": 0, "legit": 0}
@@ -117,18 +114,18 @@ def dashboard():
                            ml_available=detector.ml_available)
 
 
-@bp.route("/scan")
+@app.route("/scan")
 def scan_page():
     return render_template("scan.html")
 
 
-@bp.route("/reports")
+@app.route("/reports")
 def reports_page():
     history = _load_history(200)
     return render_template("reports.html", history=history)
 
 
-@bp.route("/api/scan", methods=["POST"])
+@app.route("/api/scan", methods=["POST"])
 def api_scan():
     data = request.get_json(silent=True) or {}
     value = data.get("input") or request.form.get("input") or ""
@@ -144,12 +141,12 @@ def api_scan():
     return jsonify(rec)
 
 
-@bp.route("/api/history")
+@app.route("/api/history")
 def api_history():
     return jsonify(_load_history(100))
 
 
-@bp.route("/api/report/<rid>")
+@app.route("/api/report/<rid>")
 def api_report(rid):
     for h in _load_history(500):
         if h.get("id") == rid:
@@ -157,17 +154,15 @@ def api_report(rid):
     return jsonify({"error": "not found"}), 404
 
 
-@bp.route("/healthz")
+@app.route("/healthz")
 def health():
     return jsonify({"status": "ok", "ml_available": detector.ml_available})
 
 
-@bp.route("/static/<path:p>")
+@app.route("/static/<path:p>")
 def static_files(p):
     return send_from_directory(BASE / "static", p)
 
-
-app.register_blueprint(bp)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
