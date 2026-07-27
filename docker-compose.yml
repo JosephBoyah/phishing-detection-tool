@@ -5,16 +5,16 @@ services:
     restart: unless-stopped
     environment:
       - PORT=5000
-      - APP_ROOT=/phishing
-      # Optional: enable Google Safe Browsing. Leave blank to disable (rule engine still works).
+      # APP_ROOT defaults to "/" so the app is served at the host root,
+      # exactly like the Foundation app (own subdomain, no path prefix).
       - SAFE_BROWSING_API_KEY=${SAFE_BROWSING_API_KEY:-}
     networks:
       foundation_net:
         ipv4_address: 172.16.1.10
     labels:
       - "traefik.enable=true"
-      # Served under the WORKING domain app.srv1846347.hstgr.cloud at /phishing
-      - "traefik.http.routers.phishing.rule=Host(`app.srv1846347.hstgr.cloud`) && PathPrefix(`/phishing`)"
+      # Own dedicated subdomain (mirrors how Foundation is served).
+      - "traefik.http.routers.phishing.rule=Host(`phish.srv1846347.hstgr.cloud`)"
       - "traefik.http.routers.phishing.entrypoints=websecure"
       - "traefik.http.routers.phishing.tls.certresolver=letsencrypt"
       - "traefik.http.services.phishing.loadbalancer.server.port=5000"

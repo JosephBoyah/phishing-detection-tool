@@ -36,7 +36,7 @@ app.jinja_env.filters["ctime"] = _ctime
 # Serve under a path prefix (e.g. /phishing behind a reverse proxy).
 # The Blueprint url_prefix drives route matching; templates/JS get APP_ROOT
 # via a context processor so asset + fetch URLs stay correct.
-APP_ROOT = os.environ.get("APP_ROOT", "/phishing").rstrip("/")
+APP_ROOT = os.environ.get("APP_ROOT", "/").rstrip("/")
 
 from flask import Blueprint
 
