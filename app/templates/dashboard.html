@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Phishing Detection Tool</title>
-<script src="/static/chart.umd.min.js"></script>
+<script src="{{ request.script_root }}/static/chart.umd.min.js"></script>
 <style>
   :root{--bg:#0f1226;--card:#1a1f3d;--accent:#7c5cff;--good:#3ddc84;--bad:#ff5470;--warn:#ffce5a;--ink:#eef0ff;--mut:#9aa0c7}
   *{box-sizing:border-box}
@@ -38,9 +38,9 @@
 <header>
   <h1>🛡️ Phishing Detection Tool</h1>
   <nav>
-    <a href="/">Dashboard</a>
-    <a href="/scan">Scan</a>
-    <a href="/reports">Reports</a>
+    <a href="{{ request.script_root }}/">Dashboard</a>
+    <a href="{{ request.script_root }}/scan">Scan</a>
+    <a href="{{ request.script_root }}/reports">Reports</a>
   </nav>
 </header>
 <div class="wrap">
@@ -76,7 +76,7 @@
         {% endfor %}
         </tbody>
       </table>
-      <a class="btn mt" href="/scan">New scan →</a>
+      <a class="btn mt" href="{{ request.script_root }}/scan">New scan →</a>
     </div>
   </div>
 </div>
