@@ -11,6 +11,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Train ML models at build time so the image is fully self-contained
+# (models/ is gitignored, so we generate it here).
+RUN python train.py || true
+
 ENV PORT=5000
 EXPOSE 5000
 

@@ -1,0 +1,22 @@
+services:
+  phishing:
+    build: .
+    image: phishing-detection-tool:latest
+    restart: unless-stopped
+    environment:
+      - PORT=5000
+      # Optional: enable Google Safe Browsing. Leave blank to disable (rule engine still works).
+      - SAFE_BROWSING_API_KEY=${SAFE_BROWSING_API_KEY:-}
+    networks:
+      - foundation_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phishing.rule=Host(`phish.srv1846347.hstgr.cloud`)"
+      - "traefik.http.routers.phishing.entrypoints=websecure"
+      - "traefik.http.routers.phishing.tls.certresolver=letsencrypt"
+      - "traefik.http.services.phishing.loadbalancer.server.port=5000"
+
+networks:
+  foundation_net:
+    external: true
+    name: foundation_net
