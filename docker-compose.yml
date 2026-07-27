@@ -11,9 +11,14 @@ services:
       - foundation_net
     labels:
       - "traefik.enable=true"
+      # Primary: paid domain (when DNS points here)
       - "traefik.http.routers.phishing.rule=Host(`phish.srv1846347.hstgr.cloud`)"
       - "traefik.http.routers.phishing.entrypoints=websecure"
       - "traefik.http.routers.phishing.tls.certresolver=letsencrypt"
+      # Fallback: free sslip.io magic domain (resolves straight to VPS IP, no purchase)
+      - "traefik.http.routers.phishing-sslip.rule=Host(`phish.187.55.230.98.sslip.io`)"
+      - "traefik.http.routers.phishing-sslip.entrypoints=websecure"
+      - "traefik.http.routers.phishing-sslip.tls.certresolver=letsencrypt"
       - "traefik.http.services.phishing.loadbalancer.server.port=5000"
 
 networks:
